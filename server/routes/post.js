@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const verifyToken = require("./../middleware/auth");
 
+//MODELS
+const Comment = require("../models/Comment");
 const Post = require("./../models/Post");
 
 /**
@@ -13,9 +15,7 @@ const Post = require("./../models/Post");
 router.post("/", verifyToken, async (req, res) => {
   const { caption, picture } = req.body;
   if (!picture)
-    return res
-      .status(400)
-      .json({ success: false, message: "Picture is required" });
+    return res.json({ success: false, message: "Picture is required" });
   try {
     const newPost = new Post({
       caption,
@@ -55,16 +55,14 @@ router.get("/:userId", async (req, res) => {
 
 /**
  * @route PUT api/posts/update
- * @description Update posts
+ * @description Update post
  * @access Private
  */
 
 router.put("/update/:id", verifyToken, async (req, res) => {
   const { caption, picture } = req.body;
   if (!picture)
-    return res
-      .status(400)
-      .json({ success: false, message: "Picture is required" });
+    return res.json({ success: false, message: "Picture is required" });
   try {
     let updatedPost = { caption, picture };
     const postUpdateCondition = { _id: req.params.id, user: req.userId };
@@ -94,30 +92,67 @@ router.put("/update/:id", verifyToken, async (req, res) => {
 });
 
 /**
+ * @route DELETE api/posts/update
+ * @description Delete post
+ * @access Private
+ */
+
+router.delete("/:id", verifyToken, async (req, res) => {
+  try {
+    const deleteCondition = { _id: req.params.id, user: req.userId };
+    const deletedPost = await Post.findOneAndDelete(deleteCondition);
+    // User not authorised to delete post
+    if (!deletedPost) {
+      return res.status(401).json({
+        success: false,
+        message: "Post not found or User not authorised",
+      });
+    }
+    res.json({
+      success: true,
+      message: "DELETED",
+      post: deletedPost,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error!" });
+  }
+});
+
+/**
  * @route PUT api/posts/like
  * @description Update posts when user like or dislike
  * @access Private
  */
 router.put("/like/:id", verifyToken, async (req, res) => {
   try {
-    const likeCondition = { _id: req.params.id };
-    let updatedPost = await Post.findById(likeCondition);
+    const updatedPostCondition = { _id: req.params.id };
+    let updatedPost = await Post.findById(updatedPostCondition);
     let message = "";
-    if (updatedPost.like.includes(req.userId)) {
+    if (updatedPost.likes.includes(req.userId)) {
       updatedPost = {
         ...updatedPost,
         _doc: {
-          like: updatedPost.like.filter((item) => item !== req.userId),
+          likes: updatedPost.likes.filter((item) => item !== req.userId),
         },
       };
       message = "Disliked!";
     } else {
-      updatedPost = { ...updatedPost, like: updatedPost.like.push(req.userId) };
+      updatedPost = {
+        ...updatedPost,
+        likes: updatedPost.likes.push(req.userId),
+      };
       message = "Liked!";
     }
-    updatedPost = await Post.findByIdAndUpdate(likeCondition, updatedPost, {
-      new: true,
-    });
+    updatedPost = await Post.findByIdAndUpdate(
+      updatedPostCondition,
+      updatedPost,
+      {
+        new: true,
+      }
+    );
 
     // User not authorised to update post
     if (!updatedPost) {
@@ -132,6 +167,55 @@ router.put("/like/:id", verifyToken, async (req, res) => {
       post: updatedPost,
     });
   } catch (error) {}
+});
+
+/**
+ * @route POST api/posts/comment
+ * @description Comment Post
+ * @access Private
+ */
+
+router.post("/comment/:id", verifyToken, async (req, res) => {
+  const { content } = req.body;
+  if (!content) {
+    return res.json({ success: false, message: "Content is required!" });
+  }
+  try {
+    const newComment = new Comment({
+      content,
+      user: req.userId,
+      post: req.params.id,
+    });
+    // console.log(newComment);
+    await newComment.save();
+    res.json({ success: true, message: "Commented!", comment: newComment });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error!" });
+  }
+});
+
+/**
+ * @route GET api/posts/comment
+ * @description GET ALL COMMENT OF POST
+ * @access Private
+ */
+
+router.get("/comment/:id", verifyToken, async (req, res) => {
+  try {
+    const comments = await Comment.find({ post: req.params.id }).populate(
+      "user",
+      ["username"]
+    );
+    res.json({ success: true, comments });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error!" });
+  }
 });
 
 module.exports = router;

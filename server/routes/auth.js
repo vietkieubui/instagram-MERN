@@ -11,13 +11,10 @@ const verifyToken = require("../middleware/auth");
  * @access Public
  */
 
-router.get("/", verifyToken, async (req, res) => {
+router.get("/user", verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.userId).select("-password");
-    if (!user)
-      return res
-        .status(400)
-        .json({ success: false, message: "User not found" });
+    if (!user) return res.json({ success: false, message: "User not found" });
     res.json({ success: true, user });
   } catch (error) {
     console.log(error);
@@ -35,17 +32,13 @@ router.post("/register", async (req, res) => {
   const { name, username, password } = req.body;
   //simple validation
   if (!username || !password || !name) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Please fill all infomation!" });
+    return res.json({ success: false, message: "Please fill all infomation!" });
   }
   try {
     //check for existing user
     const user = await User.findOne({ username });
     if (user) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Username already!" });
+      return res.json({ success: false, message: "Username already!" });
     }
     //all good
     const hashedPassword = await argon2.hash(password);
@@ -81,25 +74,28 @@ router.post("/login", async (req, res) => {
   const { username, password } = req.body;
   //simple validation
   if (!username || !password) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Missing Username and/or Password" });
+    return res.json({
+      success: false,
+      message: "Missing Username and/or Password",
+    });
   }
   try {
     //check for existing user
     const user = await User.findOne({ username });
     if (!user) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Incorrect Username or Password!" });
+      return res.json({
+        success: false,
+        message: "Incorrect Username or Password!",
+      });
     }
 
     //user found
     const passwordValid = await argon2.verify(user.password, password);
     if (!passwordValid) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Incorrect Username or password!" });
+      return res.json({
+        success: false,
+        message: "Incorrect Username or password!",
+      });
     }
     //All good
     //return Token

@@ -8,7 +8,7 @@ const PostSchema = new Schema({
   picture: {
     type: String,
   },
-  like: {
+  likes: {
     type: Array,
     default: [],
   },
