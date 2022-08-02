@@ -1,10 +1,43 @@
-import React from "react";
-import { View, StyleSheet, ScrollView } from "react-native";
+import React, { useEffect } from "react";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { Image, Icon } from "react-native-elements";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { SIZES, images } from "../../../assets/constants";
+import SinglePost from "../../Post/SinglePost";
+import { useDispatch, useSelector } from "react-redux";
+import { loadPosts } from "../../Post/PostSlice";
 
 function FeedScreen(props) {
+  const dispatch = useDispatch();
+  const postsData = useSelector((state) => state.post);
+  const user = useSelector((state) => state.auth.user);
+  useEffect(() => {
+    dispatch(loadPosts());
+  }, []);
+  let body = null;
+  if (postsData.posts.length === 0 || postsData.postsLoading) {
+    body = (
+      <View>
+        <Text>Chua co post</Text>
+      </View>
+    );
+  } else {
+    body = (
+      <ScrollView style={styles.feedContainer}>
+        {postsData.posts.map((item) => {
+          // console.log("user", post.user);
+          return (
+            <SinglePost
+              post={item}
+              key={item._id}
+              navigation={props.navigation}
+            />
+          );
+        })}
+      </ScrollView>
+    );
+  }
+  // console.log(postsData.posts);
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.topnav}>
@@ -25,15 +58,7 @@ function FeedScreen(props) {
           <Icon type="material-community" name="facebook-messenger" size={24} />
         </View>
       </View>
-      <ScrollView style={styles.feedContainer}>
-        {/* <Post />
-        <Post />
-        <Post />
-        <Post />
-        <Post />
-        <Post />
-        <Post /> */}
-      </ScrollView>
+      {body}
     </SafeAreaView>
   );
 }
@@ -44,7 +69,7 @@ const styles = StyleSheet.create({
   },
   topnav: {
     marginTop: 5,
-    marginBottom: 20,
+    marginBottom: 5,
     flexDirection: "row",
     justifyContent: "space-between",
     height: 36,

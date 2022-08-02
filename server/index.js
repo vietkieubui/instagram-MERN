@@ -7,6 +7,7 @@ const cors = require("cors");
 const authRouter = require("./routes/auth");
 const postRouter = require("./routes/post");
 const userRouter = require("./routes/user");
+const searchUserRouter = require("./routes/searchUser");
 
 const connectDB = async () => {
   try {
@@ -30,6 +31,7 @@ app.get("/", (req, res) => res.send("INSTAGRAM MERN API"));
 app.use("/api/auth", authRouter);
 app.use("/api/posts", postRouter);
 app.use("/api/user", userRouter);
+app.use("/api/search", searchUserRouter);
 
 const PORT = 5000;
 

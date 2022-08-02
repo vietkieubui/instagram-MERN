@@ -1,10 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import setAuthToken from "../../utils/setAuthToken";
-import { LOCAL_STORAGE_TOKEN_NAME } from "../../assets/constants";
+import { LOCAL_STORAGE_TOKEN_NAME, apiUrl } from "../../assets/constants";
 import axios from "axios";
-import { Alert } from "react-native";
-import { apiUrl } from "../../assets/constants";
 
 const initialState = {
   authLoading: true,

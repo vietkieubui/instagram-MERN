@@ -38,11 +38,11 @@ router.post("/", verifyToken, async (req, res) => {
  * @access Public
  */
 
-router.get("/:userId", async (req, res) => {
+router.get("/:userId", verifyToken, async (req, res) => {
   try {
     const posts = await Post.find({ user: req.params.userId }).populate(
       "user",
-      ["username"]
+      ["username", "avatar", "name", "bio"]
     );
     res.json({ success: true, posts });
   } catch (error) {
@@ -103,7 +103,7 @@ router.delete("/:id", verifyToken, async (req, res) => {
     const deletedPost = await Post.findOneAndDelete(deleteCondition);
     // User not authorised to delete post
     if (!deletedPost) {
-      return res.status(401).json({
+      return res.json({
         success: false,
         message: "Post not found or User not authorised",
       });

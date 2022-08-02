@@ -20,12 +20,9 @@ export default function EditProfileModal({ showEditModal, setShowEditModal }) {
     setShowEditModal(false);
   };
   const onUpdate = async () => {
-    console.log(name, bio);
     try {
       const response = await axios.put(`${apiUrl}/user/edit`, { name, bio });
       if (response.data.success) {
-        console.log("thanh cong");
-
         dispatch(
           authSlice.actions.setAuth({
             isAuthenticated: true,

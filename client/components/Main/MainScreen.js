@@ -11,8 +11,14 @@ import { createMaterialBottomTabNavigator } from "@react-navigation/material-bot
 //Screen
 import ProfileScreen from "./Profile/ProfileScreen";
 import FeedScreen from "./Feed/FeedScreen";
+import SearchScreen from "./Search/SearchScreen";
+import { loadPosts } from "../Post/PostSlice";
+import AddScreen from "../Add/AddScreen";
 
 const Tab = createMaterialBottomTabNavigator();
+const EpmtyScreen = () => {
+  return null;
+};
 
 export default function MainScreen({ navigation }) {
   const dispatch = useDispatch();
@@ -28,41 +34,67 @@ export default function MainScreen({ navigation }) {
       </SafeAreaView>
     );
   }
-  // console.log(auth);
+
   return (
-    // <SafeAreaView>
-    //   <Button style={{ paddingTop: 500 }} title="LOGOUT" onPress={onLogout} />
-    //   <Text>{auth.user.name}</Text>
-    //   <Text>{auth.user._id}</Text>
-    // </SafeAreaView>
-    <Tab.Navigator initialRouteName="Feed">
-      <Tab.Screen
-        name="Feed"
-        component={FeedScreen}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Icon type="entypo" name="home" size={26} color={color} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
-        navigation={navigation}
-        listeners={({ navigation }) => ({
-          tabPress: (event) => {
-            event.preventDefault();
-            navigation.navigate("Profile", {
-              uid: auth.user._id,
-            });
-          },
-        })}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Icon type="font-awesome" name="user" size={26} color={color} />
-          ),
-        }}
-      />
-    </Tab.Navigator>
+    <>
+      <Tab.Navigator initialRouteName="Feed">
+        <Tab.Screen
+          name="Feed"
+          component={FeedScreen}
+          options={{
+            tabBarIcon: ({ color, size }) => (
+              <Icon type="entypo" name="home" size={26} color={color} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Search"
+          component={SearchScreen}
+          options={{
+            tabBarIcon: ({ color, size }) => (
+              <Icon type="antdesign" name="search1" size={26} color={color} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="AddContainer"
+          component={EpmtyScreen}
+          listeners={({ navigation }) => ({
+            tabPress: (event) => {
+              event.preventDefault();
+              navigation.navigate("Add");
+            },
+          })}
+          options={{
+            tabBarIcon: ({ color, size }) => (
+              <Icon
+                type="antdesign"
+                name="plussquareo"
+                size={26}
+                color={color}
+              />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Profile"
+          component={ProfileScreen}
+          navigation={navigation}
+          listeners={({ navigation }) => ({
+            tabPress: (event) => {
+              event.preventDefault();
+              navigation.navigate("Profile", {
+                user: auth.user,
+              });
+            },
+          })}
+          options={{
+            tabBarIcon: ({ color, size }) => (
+              <Icon type="font-awesome" name="user" size={26} color={color} />
+            ),
+          }}
+        />
+      </Tab.Navigator>
+    </>
   );
 }

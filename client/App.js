@@ -10,6 +10,9 @@ import RegisterScreen from "./components/Auth/Register";
 import { Provider } from "react-redux";
 import store from "./redux/store";
 import MainScreen from "./components/Main/MainScreen";
+import AddScreen from "./components/Add/AddScreen";
+import SaveScreen from "./components/Main/Save/SaveScreen";
+import PostScreen from "./components/Post/PostScreen";
 
 const Stack = createStackNavigator();
 
@@ -37,6 +40,21 @@ export default function App() {
             name="Main"
             component={MainScreen}
             options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Add"
+            component={AddScreen}
+            options={{ headerShown: true }}
+          />
+          <Stack.Screen
+            name="Save"
+            component={SaveScreen}
+            options={{ headerShown: true }}
+          />
+          <Stack.Screen
+            name="Post"
+            component={PostScreen}
+            options={{ headerShown: true }}
           />
         </Stack.Navigator>
       </NavigationContainer>
