@@ -58,7 +58,7 @@ router.get("/followings/:userId", verifyToken, async (req, res) => {
     const followingsCondition = { user: req.params.userId };
     const followings = await Follow.find(followingsCondition).populate(
       "follow",
-      ["username", "avatar", "name"]
+      ["username", "avatar", "name", "bio"]
     );
     const tmpArray = followings.map((item) => item.follow);
     res.json({ success: true, followings: tmpArray });

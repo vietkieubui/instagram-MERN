@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  FlatList,
   TouchableOpacity,
 } from "react-native";
 import { Button, Icon, Image } from "react-native-elements";
@@ -14,27 +13,46 @@ import {
   SIZES,
   COLORS,
   LOCAL_STORAGE_TOKEN_NAME,
+  apiUrl,
 } from "./../../../assets/constants";
 import { useSelector, useDispatch } from "react-redux";
 import { loadUser } from "../../Auth/AuthSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import EditProfileModal from "./EditProfileModal";
-import { loadPosts, loadUserPosts } from "../../Post/PostSlice";
-import { loadUserFollow } from "../../Follow/FollowSlice";
+import EditProfileModal from "./Modals/EditProfileModal";
+import postSlice, { loadPosts, loadUserPosts } from "../../Post/PostSlice";
+import followSlice, { loadUserFollow } from "../../Follow/FollowSlice";
+import axios from "axios";
+import FollowingsModal from "./Modals/FollowingsModal";
+import FollowersModal from "./Modals/FollowersModal";
 
 function ProfileScreen(props) {
   const dispatch = useDispatch();
+
   const auth = useSelector((state) => state.auth);
+  const currentUser = useSelector((state) => state.auth.user);
   const postsData = useSelector((state) => state.post);
   const follow = useSelector((state) => state.follow);
   const userPostsData = useSelector((state) => state.post.userPosts);
+  const setLoading = () => {
+    dispatch(postSlice.actions.setPostsLoading());
+    dispatch(followSlice.actions.setFollowLoading());
+  };
 
   useEffect(() => {
-    dispatch(loadUser());
+    setLoading();
     dispatch(loadUserPosts(props.route.params.user._id));
-    dispatch(loadUserFollow(props.route.params.user._id));
+    dispatch(
+      loadUserFollow({
+        userId: props.route.params.user._id,
+        currentUserId: auth.user._id,
+      })
+    );
   }, [props.route.params.user._id]);
+
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showFollowingsModal, setShowFollowingsModal] = useState(false);
+  const [showFollowersModal, setShowFollowersModal] = useState(false);
+
   if (postsData.postsLoading || follow.followLoading) {
     return null;
   }
@@ -42,20 +60,45 @@ function ProfileScreen(props) {
   const onLogout = async () => {
     await AsyncStorage.removeItem(LOCAL_STORAGE_TOKEN_NAME);
     dispatch(loadUser());
+    setLoading();
     props.navigation.navigate("Landing");
   };
-  const checkFollow = () => {
-    follow.followers.map();
-  };
 
-  const onFollowing = async () => {};
+  const onFollow = async () => {
+    try {
+      const dataFollow = await axios.post(
+        `${apiUrl}/follow/${props.route.params.user._id}`
+      );
+      if (dataFollow.data.success) {
+        dispatch(
+          loadUserFollow({
+            userId: props.route.params.user._id,
+            currentUserId: auth.user._id,
+          })
+        );
+      }
+    } catch (error) {}
+  };
 
   return (
     <SafeAreaView>
       <ScrollView>
         <EditProfileModal
+          {...props}
           showEditModal={showEditModal}
           setShowEditModal={setShowEditModal}
+        />
+        <FollowingsModal
+          {...props}
+          followings={follow.followings}
+          showFollowingsModal={showFollowingsModal}
+          setShowFollowingsModal={setShowFollowingsModal}
+        />
+        <FollowersModal
+          {...props}
+          followers={follow.followers}
+          showFollowersModal={showFollowersModal}
+          setShowFollowersModal={setShowFollowersModal}
         />
         <View style={styles.container}>
           <View style={styles.topnav}>
@@ -126,7 +169,9 @@ function ProfileScreen(props) {
                   Posts
                 </Text>
               </View>
-              <View>
+              <TouchableOpacity
+                onPress={setShowFollowersModal.bind(this, true)}
+              >
                 <Text
                   style={{
                     fontFamily: "Roboto-Medium",
@@ -135,7 +180,7 @@ function ProfileScreen(props) {
                     alignSelf: "center",
                   }}
                 >
-                  {follow.follower.length}
+                  {follow.followers.length}
                 </Text>
                 <Text
                   style={{
@@ -146,8 +191,10 @@ function ProfileScreen(props) {
                 >
                   Followers
                 </Text>
-              </View>
-              <View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={setShowFollowingsModal.bind(this, true)}
+              >
                 <Text
                   style={{
                     fontFamily: "Roboto-Medium",
@@ -156,7 +203,7 @@ function ProfileScreen(props) {
                     alignSelf: "center",
                   }}
                 >
-                  {follow.following.length}
+                  {follow.followings.length}
                 </Text>
                 <Text
                   style={{
@@ -165,9 +212,9 @@ function ProfileScreen(props) {
                     fontSize: 18,
                   }}
                 >
-                  Following
+                  Followings
                 </Text>
-              </View>
+              </TouchableOpacity>
             </View>
           </View>
           <Text style={{ marginTop: 5, marginLeft: 15, ...FONTS.h5 }}>
@@ -199,41 +246,40 @@ function ProfileScreen(props) {
             />
           ) : (
             <View style={styles.buttonGroup}>
-              {
-                /*following*/ false ? (
-                  <Button
-                    title="Following"
-                    style={{ flex: 1 }}
-                    buttonStyle={{
-                      marginLeft: 15,
-                      borderRadius: 10,
-                      backgroundColor: "#FFFFFF",
-                      borderColor: "#CBCBCB",
-                      borderWidth: 2,
-                      borderStyle: "solid",
-                      width: 160,
-                    }}
-                    titleStyle={{ color: "#000000", fontSize: 15 }}
-                  />
-                ) : (
-                  <Button
-                    title="Follow"
-                    style={{ flex: 1 }}
-                    buttonStyle={{
-                      marginLeft: 15,
-                      borderRadius: 10,
-                      backgroundColor: COLORS.primary,
-                      borderColor: "#CBCBCB",
-                      borderWidth: 2,
-                      borderStyle: "solid",
-                      width: 160,
-                    }}
-                    titleStyle={{ color: "#FFFFFF", fontSize: 15 }}
-                  />
-                )
-              }
               <Button
-                title="Messenger"
+                title={follow.followed ? "Following" : "Follow"}
+                onPress={onFollow}
+                style={{ flex: 1 }}
+                buttonStyle={
+                  follow.followed
+                    ? {
+                        marginLeft: 15,
+                        borderRadius: 10,
+                        backgroundColor: "#FFFFFF",
+                        borderColor: "#CBCBCB",
+                        borderWidth: 2,
+                        borderStyle: "solid",
+                        width: 160,
+                      }
+                    : {
+                        marginLeft: 15,
+                        borderRadius: 10,
+                        backgroundColor: COLORS.primary,
+                        borderColor: "#CBCBCB",
+                        borderWidth: 2,
+                        borderStyle: "solid",
+                        width: 160,
+                      }
+                }
+                titleStyle={
+                  follow.followed
+                    ? { color: "#000000", fontSize: 15 }
+                    : { color: "#FFFFFF", fontSize: 15 }
+                }
+              />
+
+              <Button
+                title="Message"
                 style={{ flex: 1 }}
                 buttonStyle={{
                   marginRight: 15,

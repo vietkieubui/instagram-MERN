@@ -1,19 +1,15 @@
 import React, { useEffect } from "react";
-import { View, Text } from "react-native";
-import { Button, Icon } from "react-native-elements";
+import { Text } from "react-native";
+import { Icon } from "react-native-elements";
 import { SafeAreaView } from "react-native-safe-area-context";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { LOCAL_STORAGE_TOKEN_NAME } from "../../assets/constants";
 import { useDispatch, useSelector } from "react-redux";
-import authSlice, { loadUser } from "../Auth/AuthSlice";
-
+import { loadUser } from "../Auth/AuthSlice";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 //Screen
 import ProfileScreen from "./Profile/ProfileScreen";
 import FeedScreen from "./Feed/FeedScreen";
 import SearchScreen from "./Search/SearchScreen";
-import { loadPosts } from "../Post/PostSlice";
-import AddScreen from "../Add/AddScreen";
+import { loadFollowingPosts } from "../Post/PostSlice";
 
 const Tab = createMaterialBottomTabNavigator();
 const EpmtyScreen = () => {
@@ -23,11 +19,15 @@ const EpmtyScreen = () => {
 export default function MainScreen({ navigation }) {
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
+  const follow = useSelector((state) => state.follow);
+  const post = useSelector((state) => state.post);
   useEffect(() => {
     dispatch(loadUser());
   }, []);
+  useEffect(() => {
+    if (auth.user !== null) dispatch(loadFollowingPosts(auth.user));
+  }, [auth]);
 
-  // console.log(auth);
   if (auth.authLoading || !auth.isAuthenticated) {
     return (
       <SafeAreaView>
@@ -47,6 +47,12 @@ export default function MainScreen({ navigation }) {
               <Icon type="entypo" name="home" size={26} color={color} />
             ),
           }}
+          // listeners={() => ({
+          //   tabPress: (event) => {
+          //     event.preventDefault();
+          //     dispatch(loadFollowingPosts(auth.user));
+          //   },
+          // })}
         />
         <Tab.Screen
           name="Search"

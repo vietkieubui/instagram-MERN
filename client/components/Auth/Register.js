@@ -10,9 +10,12 @@ import {
 } from "../../assets/constants";
 import { Input, Button } from "react-native-elements";
 import axios from "axios";
+import { useDispatch } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { loadUser } from "./AuthSlice";
 
 export default function RegisterScreen({ navigation }) {
+  const dispatch = useDispatch();
   const [registerForm, setRegisterForm] = useState({
     name: "",
     username: "",
@@ -44,6 +47,7 @@ export default function RegisterScreen({ navigation }) {
           password: "",
           confirmPassword: "",
         });
+        dispatch(loadUser());
         Alert.alert("Success!", dataRegister.data.message, [
           { text: "OK", onPress: () => navigation.navigate("Main") },
         ]);

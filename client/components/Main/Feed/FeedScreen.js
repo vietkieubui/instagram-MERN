@@ -9,23 +9,22 @@ import { loadPosts } from "../../Post/PostSlice";
 
 function FeedScreen(props) {
   const dispatch = useDispatch();
-  const postsData = useSelector((state) => state.post);
+  const post = useSelector((state) => state.post);
   const user = useSelector((state) => state.auth.user);
   useEffect(() => {
-    dispatch(loadPosts());
+    // dispatch(loadPosts());
   }, []);
   let body = null;
-  if (postsData.posts.length === 0 || postsData.postsLoading) {
+  if (post.postsLoading) {
     body = (
       <View>
-        <Text>Chua co post</Text>
+        <Text>loading o feed</Text>
       </View>
     );
   } else {
     body = (
       <ScrollView style={styles.feedContainer}>
-        {postsData.posts.map((item) => {
-          // console.log("user", post.user);
+        {post.followingPosts.map((item) => {
           return (
             <SinglePost
               post={item}

@@ -5,20 +5,23 @@ import axios from "axios";
 const initialState = {
   followers: [],
   followings: [],
+  followed: false,
   followLoading: true,
 };
 
 export const loadUserFollow = createAsyncThunk(
   "follow/loadUserFollow",
-  async (userId) => {
-    let followings = null;
-    let followers = null;
+  async ({ userId, currentUserId }) => {
+    let followings = [];
+    let followers = [];
+    let followed = false;
     const dataLoadUserFollowings = await axios.get(
-      `${apiUrl}/follow/followings${userId}`
+      `${apiUrl}/follow/followings/${userId}`
     );
     const dataLoadUserFollowers = await axios.get(
       `${apiUrl}/follow/followers/${userId}`
     );
+
     if (
       dataLoadUserFollowings.data.success &&
       dataLoadUserFollowers.data.success
@@ -28,13 +31,17 @@ export const loadUserFollow = createAsyncThunk(
         followings.reverse();
       }
 
-      followers = dataLoadUserFollowers.data.follower;
+      followers = dataLoadUserFollowers.data.followers;
       if (followers.length !== 0) {
         followers.reverse();
+        if (followers.find((follower) => follower._id === currentUserId)) {
+          followed = true;
+        }
       }
       return {
         followings,
         followers,
+        followed,
         followLoading: false,
       };
     }
@@ -44,12 +51,17 @@ export const loadUserFollow = createAsyncThunk(
 const followSlice = createSlice({
   name: "follow",
   initialState,
-  reducers: {},
+  reducers: {
+    setFollowLoading: (state, action) => {
+      state.followLoading = true;
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(loadUserFollow.fulfilled, (state, action) => {
       state.followLoading = action.payload.followLoading;
       state.followings = action.payload.followings;
       state.followers = action.payload.followers;
+      state.followed = action.payload.followed;
     });
   },
 });

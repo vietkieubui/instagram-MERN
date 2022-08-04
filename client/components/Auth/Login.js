@@ -11,8 +11,11 @@ import {
 import { Input, Button } from "react-native-elements";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { loadUser } from "./AuthSlice";
 
 export default function LoginScreen({ navigation }) {
+  const dispatch = useDispatch();
   const [loginForm, setLoginForm] = useState({
     username: "",
     password: "",
@@ -30,7 +33,9 @@ export default function LoginScreen({ navigation }) {
           LOCAL_STORAGE_TOKEN_NAME,
           dataLogin.data.accessToken
         );
+
         setLoginForm({ username: "", password: "" });
+        dispatch(loadUser());
         navigation.navigate("Main");
       } else {
         Alert.alert("Error!", dataLogin.data.message);

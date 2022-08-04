@@ -8,6 +8,7 @@ const initialState = {
   post: null,
   posts: [],
   userPosts: [],
+  followingPosts: [],
   postsLoading: true,
 };
 
@@ -54,38 +55,43 @@ export const loadUserPosts = createAsyncThunk(
     }
   }
 );
-//postsFeed
-//PostsUser
-//Post
+
+export const loadFollowingPosts = createAsyncThunk(
+  "post/loadFollowingPosts",
+  async (currentUser) => {
+    try {
+      const dataFollowingPosts = await axios.get(
+        `${apiUrl}/posts/followings/${currentUser._id}`
+      );
+      if (dataFollowingPosts.data.success) {
+        let tmpFollowingPost = dataFollowingPosts.data.followingPosts;
+        if (tmpFollowingPost.length !== 0) {
+          tmpFollowingPost.reverse();
+        }
+        return {
+          followingPosts: tmpFollowingPost,
+        };
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
+
+const getPosts = async (userId) => {
+  const dataPosts = await axios.get(`${apiUrl}/posts/${userId}`);
+  if (dataPosts.data.success) {
+    return dataPosts.data.posts;
+  }
+  return null;
+};
 
 const postSlice = createSlice({
   name: "post",
   initialState,
   reducers: {
-    getPosts: (state, action) => {
-      state.postsLoading = false;
-      state.posts = action.payload;
-    },
-    getPostsFail: (state, action) => {
-      state.postsLoading = false;
-      state.posts = [];
-    },
-    addPost: (state, action) => {
-      state.posts.push(action.payload);
-    },
-    deletePost: (state, action) => {
-      state.posts = state.posts.filter((post) => post._id !== action.payload);
-    },
-    updatePost: (state, { payload }) => {
-      state.posts = state.posts.map((post) =>
-        post._id === payload._id ? payload : post
-      );
-    },
-    findPost: (state, { payload }) => {
-      state.post = state.posts.find((post) => post._id === payload);
-    },
-    setPost: (state, action) => {
-      state.post = action.payload.post;
+    setPostsLoading: (state, action) => {
+      state.postsLoading = true;
     },
   },
   extraReducers: (builder) => {
@@ -97,6 +103,10 @@ const postSlice = createSlice({
     builder.addCase(loadUserPosts.fulfilled, (state, action) => {
       state.userPosts = action.payload.userPosts;
       state.postsLoading = action.payload.postsLoading;
+    });
+    builder.addCase(loadFollowingPosts.fulfilled, (state, action) => {
+      state.followingPosts = action.payload.followingPosts;
+      state.postsLoading = false;
     });
   },
 });

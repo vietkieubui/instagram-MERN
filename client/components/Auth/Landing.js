@@ -2,26 +2,22 @@ import React, { useEffect } from "react";
 import { StyleSheet, Text } from "react-native";
 import { Button, Image } from "react-native-elements";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  COLORS,
-  images,
-  LOCAL_STORAGE_TOKEN_NAME,
-  SIZES,
-} from "../../assets/constants";
+import { COLORS, images, SIZES } from "../../assets/constants";
 import { useSelector, useDispatch } from "react-redux";
 import MainScreen from "../Main/MainScreen";
 import { loadUser } from "./AuthSlice";
+import { loadFollowingsList } from "../Follow/FollowSlice";
 
 export default function Landing({ navigation }) {
   const dispatch = useDispatch();
+  const auth = useSelector((state) => state.auth);
   useEffect(() => {
     dispatch(loadUser());
   }, []);
-  const auth = useSelector((state) => state.auth);
   if (auth.authLoading)
     return (
       <SafeAreaView>
-        <Text>LOADING</Text>
+        <Text>LOADING o landinh</Text>
       </SafeAreaView>
     );
   return (

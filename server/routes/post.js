@@ -5,6 +5,7 @@ const verifyToken = require("./../middleware/auth");
 //MODELS
 const Comment = require("../models/Comment");
 const Post = require("./../models/Post");
+const Follow = require("./../models/Follow");
 
 /**
  * @route POST api/posts
@@ -221,6 +222,39 @@ router.get("/comment/:id", verifyToken, async (req, res) => {
       .json({ success: false, message: "Internal server error!" });
   }
 });
-//Test deploy
+
+/**
+ * @route GET api/posts/followings/
+ * @description GET FOLLOWING POSTS
+ * @access Private
+ */
+
+router.get("/followings/:userId", verifyToken, async (req, res) => {
+  try {
+    const following = await Follow.find({ user: req.params.userId }).populate(
+      "follow",
+      ["username", "avatar", "name", "bio"]
+    );
+    const tmpArray = following.map((item) => item.follow);
+
+    const followingPostsCondition = {
+      $or: [
+        ...tmpArray.map((user) => ({ user: user._id })),
+        { user: req.params.userId },
+      ],
+    };
+
+    const followingPosts = await Post.find(followingPostsCondition).populate(
+      "user",
+      ["username", "avatar", "name", "bio"]
+    );
+    return res.json({ success: true, message: "Success", followingPosts });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error!" });
+  }
+});
 
 module.exports = router;

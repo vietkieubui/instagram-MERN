@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import {
   View,
   Image,
@@ -10,11 +9,13 @@ import {
   Alert,
 } from "react-native";
 import { Icon } from "react-native-elements";
-import { apiUrl, FONTS, images, SIZES } from "./../../assets/constants";
+import { apiUrl, FONTS, SIZES } from "./../../assets/constants";
 import axios from "axios";
-import { useSelector } from "react-redux";
+import { loadUserPosts } from "../Post/PostSlice";
+import { useSelector, useDispatch } from "react-redux";
 
 export default function PostScreen(props) {
+  const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.auth.user);
   const [showDeleteButton, setShowDeleteButton] = useState(false);
   if (!props.route.params.post) {
@@ -40,7 +41,14 @@ export default function PostScreen(props) {
           const dataDeletePost = await axios.delete(`${apiUrl}/posts/${_id}`);
           if (dataDeletePost.data.success) {
             Alert.alert("Success!", "Deleted!", [
-              { text: "OK", onPress: props.navigation.navigate("Main") },
+              {
+                text: "OK",
+                onPress: () => {
+                  setShowDeleteButton(false);
+                  dispatch(loadUserPosts(user._id));
+                  props.navigation.navigate("Main");
+                },
+              },
             ]);
           } else {
             Alert.alert("Failed!", dataDeletePost.data.message);
