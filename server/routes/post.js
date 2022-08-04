@@ -108,7 +108,7 @@ router.delete("/:id", verifyToken, async (req, res) => {
         message: "Post not found or User not authorised",
       });
     }
-    res.json({
+    return res.json({
       success: true,
       message: "DELETED",
       post: deletedPost,
@@ -166,7 +166,11 @@ router.put("/like/:id", verifyToken, async (req, res) => {
       message: message,
       post: updatedPost,
     });
-  } catch (error) {}
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error!" });
+  }
 });
 
 /**

@@ -20,25 +20,35 @@ import { loadUser } from "../../Auth/AuthSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import EditProfileModal from "./EditProfileModal";
 import { loadPosts, loadUserPosts } from "../../Post/PostSlice";
+import { loadUserFollow } from "../../Follow/FollowSlice";
 
 function ProfileScreen(props) {
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
   const postsData = useSelector((state) => state.post);
+  const follow = useSelector((state) => state.follow);
   const userPostsData = useSelector((state) => state.post.userPosts);
 
   useEffect(() => {
     dispatch(loadUser());
-    dispatch(loadPosts());
     dispatch(loadUserPosts(props.route.params.user._id));
+    dispatch(loadUserFollow(props.route.params.user._id));
   }, [props.route.params.user._id]);
   const [showEditModal, setShowEditModal] = useState(false);
+  if (postsData.postsLoading || follow.followLoading) {
+    return null;
+  }
 
   const onLogout = async () => {
     await AsyncStorage.removeItem(LOCAL_STORAGE_TOKEN_NAME);
     dispatch(loadUser());
     props.navigation.navigate("Landing");
   };
+  const checkFollow = () => {
+    follow.followers.map();
+  };
+
+  const onFollowing = async () => {};
 
   return (
     <SafeAreaView>
@@ -125,7 +135,7 @@ function ProfileScreen(props) {
                     alignSelf: "center",
                   }}
                 >
-                  {/* {followersList.length} */}0
+                  {follow.follower.length}
                 </Text>
                 <Text
                   style={{
@@ -146,7 +156,7 @@ function ProfileScreen(props) {
                     alignSelf: "center",
                   }}
                 >
-                  {/* {followingList.length} */}0
+                  {follow.following.length}
                 </Text>
                 <Text
                   style={{

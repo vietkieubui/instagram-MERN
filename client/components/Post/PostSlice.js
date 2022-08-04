@@ -1,16 +1,14 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { LOCAL_STORAGE_TOKEN_NAME, apiUrl } from "../../assets/constants";
 import axios from "axios";
-import authSlice from "../Auth/AuthSlice";
-import { useSelector, useDispatch } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import setAuthToken from "../../utils/setAuthToken";
 
 const initialState = {
   post: null,
   posts: [],
-  postsLoading: true,
   userPosts: [],
+  postsLoading: true,
 };
 
 export const loadPosts = createAsyncThunk("post/loadPosts", async () => {
@@ -46,9 +44,10 @@ export const loadUserPosts = createAsyncThunk(
     const dataLoadUserPosts = await axios.get(`${apiUrl}/posts/${userId}`);
     if (dataLoadUserPosts.data.success) {
       data = dataLoadUserPosts.data.posts;
-      data.reverse();
+      if (data.length !== 0) {
+        data.reverse();
+      }
       return {
-        // post: null,
         userPosts: data,
         postsLoading: false,
       };

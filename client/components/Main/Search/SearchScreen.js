@@ -18,11 +18,7 @@ export default function SearchScreen(props) {
   if (users.length === 0 && searchText === "") {
     body = null;
   } else if (users.length === 0 && searchText !== "") {
-    body = (
-      <View>
-        <Text>User not found!</Text>
-      </View>
-    );
+    body = null;
   } else {
     body = (
       <View>
@@ -41,17 +37,19 @@ export default function SearchScreen(props) {
     );
   }
 
-  const handleSearch = useCallback(
-    debounce(async (nextValue) => {
-      const dataSearchUser = await axios.get(`${apiUrl}/search/${nextValue}`);
+  const handleSearch = debounce(async (nextValue) => {
+    if (nextValue !== "") {
+      const dataSearchUser = await axios
+        .get(`${apiUrl}/search/${nextValue}`)
+        .catch(() => {});
       if (dataSearchUser.data.success) {
         setUsers(dataSearchUser.data.users);
       } else {
         Alert.alert("Error!", "Error from server!");
       }
-    }, 1000),
-    []
-  );
+    }
+  }, 1000);
+
   const onChangeSearchText = (text) => {
     setSearchText(text);
   };

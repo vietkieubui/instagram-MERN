@@ -27,10 +27,11 @@ export default function MainScreen({ navigation }) {
     dispatch(loadUser());
   }, []);
 
+  // console.log(auth);
   if (auth.authLoading || !auth.isAuthenticated) {
     return (
       <SafeAreaView>
-        <Text>LOADING</Text>
+        <Text>LOADING o main</Text>
       </SafeAreaView>
     );
   }
