@@ -55,6 +55,12 @@ const followSlice = createSlice({
     setFollowLoading: (state, action) => {
       state.followLoading = true;
     },
+    setDefault: (state, action) => {
+      state.followers = [];
+      state.followings = [];
+      state.followed = false;
+      state.followLoading = true;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(loadUserFollow.fulfilled, (state, action) => {

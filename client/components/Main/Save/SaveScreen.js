@@ -7,7 +7,7 @@ import { Input } from "react-native-elements";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import { apiUrl } from "../../../assets/constants";
-import { loadPosts, loadUserPosts } from "../../Post/PostSlice";
+import { loadUserPosts } from "../../Main/Post/PostSlice";
 
 require("firebase/firestore");
 require("firebase/storage");
@@ -71,7 +71,6 @@ export default function SaveScreen(props) {
           {
             text: "OK",
             onPress: () => {
-              dispatch(loadPosts());
               dispatch(loadUserPosts(currentUser._id));
               props.navigation.navigate("Main");
             },

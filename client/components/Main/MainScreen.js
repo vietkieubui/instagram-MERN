@@ -9,7 +9,7 @@ import { createMaterialBottomTabNavigator } from "@react-navigation/material-bot
 import ProfileScreen from "./Profile/ProfileScreen";
 import FeedScreen from "./Feed/FeedScreen";
 import SearchScreen from "./Search/SearchScreen";
-import { loadFollowingPosts } from "../Post/PostSlice";
+import { loadFollowingPosts } from "../Main/Post/PostSlice";
 
 const Tab = createMaterialBottomTabNavigator();
 const EpmtyScreen = () => {
@@ -24,6 +24,7 @@ export default function MainScreen({ navigation }) {
   useEffect(() => {
     dispatch(loadUser());
   }, []);
+
   useEffect(() => {
     if (auth.user !== null) dispatch(loadFollowingPosts(auth.user));
   }, [auth]);
@@ -47,12 +48,9 @@ export default function MainScreen({ navigation }) {
               <Icon type="entypo" name="home" size={26} color={color} />
             ),
           }}
-          // listeners={() => ({
-          //   tabPress: (event) => {
-          //     event.preventDefault();
-          //     dispatch(loadFollowingPosts(auth.user));
-          //   },
-          // })}
+          listeners={() => ({
+            tabPress: () => dispatch(loadFollowingPosts(auth.user)),
+          })}
         />
         <Tab.Screen
           name="Search"

@@ -65,7 +65,7 @@ export default function FollowingsModal({
 
   return (
     <View style={{ flex: 1 }}>
-      <Modal isVisible={showFollowingsModal}>
+      <Modal isVisible={showFollowingsModal} onBackdropPress={onClose}>
         <View style={{ backgroundColor: "white" }}>
           <Text style={{ ...FONTS.h1, alignSelf: "center" }}>Followings</Text>
           <ScrollView>{body}</ScrollView>

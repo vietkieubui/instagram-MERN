@@ -1,39 +1,39 @@
-import React from "react";
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, Alert, TouchableOpacity, ScrollView } from "react-native";
 import Modal from "react-native-modal";
-import { Button, Image } from "react-native-elements";
-import { FONTS } from "../../../../assets/constants";
+import { Input, Button, Image } from "react-native-elements";
+import { FONTS, SIZES } from "../../../../assets/constants";
 
-export default function FollowersModal({
-  followers,
+export default function LikesListModal({
+  likes,
   navigation,
-  showFollowersModal,
-  setShowFollowersModal,
+  showLikesModal,
+  setShowLikesModal,
 }) {
   let body = null;
 
-  const SingleFollower = ({ follower }) => {
+  const SingleLike = ({ user }) => {
     return (
       <TouchableOpacity
         style={{ margin: 10, borderColor: "red", borderWidth: 1 }}
         onPress={() => {
-          setShowFollowersModal(false);
-          navigation.navigate("Profile", { user: follower });
+          setShowLikesModal(false);
+          navigation.navigate("Profile", { user: user });
         }}
       >
         <View style={{ flexDirection: "row", padding: 5 }}>
           <View style={{ marginRight: 10 }}>
             <Image
               style={{ width: 50, height: 50, borderRadius: 50 }}
-              source={{ uri: follower.avatar }}
+              source={{ uri: user.avatar }}
             />
           </View>
           <View>
             <Text style={{ ...FONTS.h4, fontWeight: "bold" }}>
-              {follower.username}
+              {user.username}
             </Text>
             <Text style={{ ...FONTS.h5, fontWeight: "normal" }}>
-              {follower.name}
+              {user.name}
             </Text>
           </View>
         </View>
@@ -41,33 +41,32 @@ export default function FollowersModal({
     );
   };
 
-  if (followers.length === 0) {
+  if (likes.length === 0) {
     body = (
       <View>
-        <Text style={{ alignSelf: "center" }}>
-          No one is following this person
-        </Text>
+        <Text style={{ alignSelf: "center" }}>No one likes this post!</Text>
       </View>
     );
   } else {
+    // console.log(likes);
     body = (
       <View style={{ flexDirection: "column" }}>
-        {followers.map((item) => (
-          <SingleFollower key={item._id} follower={item} />
+        {likes.map((item) => (
+          <SingleLike key={item._id} user={item} />
         ))}
       </View>
     );
   }
 
   const onClose = () => {
-    setShowFollowersModal(false);
+    setShowLikesModal(false);
   };
 
   return (
     <View style={{ flex: 1 }}>
-      <Modal isVisible={showFollowersModal} onBackdropPress={onClose}>
+      <Modal isVisible={showLikesModal} onBackdropPress={onClose}>
         <View style={{ backgroundColor: "white" }}>
-          <Text style={{ ...FONTS.h1, alignSelf: "center" }}>Followers</Text>
+          <Text style={{ ...FONTS.h1, alignSelf: "center" }}>Likes</Text>
           <ScrollView>{body}</ScrollView>
           <View
             style={{

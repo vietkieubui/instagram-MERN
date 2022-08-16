@@ -1,11 +1,16 @@
 import React, { useEffect } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import { Image, Icon } from "react-native-elements";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { SIZES, images } from "../../../assets/constants";
-import SinglePost from "../../Post/SinglePost";
+import SinglePost from "../../Main/Post/SinglePost";
 import { useDispatch, useSelector } from "react-redux";
-import { loadPosts } from "../../Post/PostSlice";
 
 function FeedScreen(props) {
   const dispatch = useDispatch();
@@ -53,8 +58,18 @@ function FeedScreen(props) {
             marginTop: 6,
           }}
         >
-          <Icon type="antdesign" name="plussquareo" size={24} />
-          <Icon type="material-community" name="facebook-messenger" size={24} />
+          <TouchableOpacity>
+            <Icon type="antdesign" name="plussquareo" size={24} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => props.navigation.navigate("Conversations")}
+          >
+            <Icon
+              type="material-community"
+              name="facebook-messenger"
+              size={24}
+            />
+          </TouchableOpacity>
         </View>
       </View>
       {body}

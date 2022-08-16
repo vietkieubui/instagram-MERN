@@ -2,17 +2,21 @@ import "react-native-gesture-handler";
 import React from "react";
 import { StyleSheet, LogBox } from "react-native";
 import { useFonts } from "expo-font";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, useFocusEffect } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+//redux
+import { Provider } from "react-redux";
+import store from "./redux/store";
+//screen
 import Landing from "./components/Auth/Landing";
 import LoginScreen from "./components/Auth/Login";
 import RegisterScreen from "./components/Auth/Register";
-import { Provider } from "react-redux";
-import store from "./redux/store";
 import MainScreen from "./components/Main/MainScreen";
 import AddScreen from "./components/Add/AddScreen";
 import SaveScreen from "./components/Main/Save/SaveScreen";
-import PostScreen from "./components/Post/PostScreen";
+import PostScreen from "./components/Main/Post/PostScreen";
+import ConversationsScreen from "./components/Main/Chat/ConversationsScreen";
+import ChatScreen from "./components/Main/Chat/ChatScreen";
 
 const Stack = createStackNavigator();
 
@@ -55,6 +59,17 @@ export default function App() {
             name="Post"
             component={PostScreen}
             options={{ headerShown: true }}
+          />
+
+          <Stack.Screen
+            name="Conversations"
+            component={ConversationsScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Chat"
+            component={ChatScreen}
+            options={{ headerShown: false }}
           />
         </Stack.Navigator>
       </NavigationContainer>

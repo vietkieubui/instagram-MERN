@@ -6,7 +6,6 @@ import { COLORS, images, SIZES } from "../../assets/constants";
 import { useSelector, useDispatch } from "react-redux";
 import MainScreen from "../Main/MainScreen";
 import { loadUser } from "./AuthSlice";
-import { loadFollowingsList } from "../Follow/FollowSlice";
 
 export default function Landing({ navigation }) {
   const dispatch = useDispatch();
@@ -17,7 +16,7 @@ export default function Landing({ navigation }) {
   if (auth.authLoading)
     return (
       <SafeAreaView>
-        <Text>LOADING o landinh</Text>
+        <Text>LOADING in Landing</Text>
       </SafeAreaView>
     );
   return (

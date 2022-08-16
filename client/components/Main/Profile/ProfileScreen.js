@@ -19,11 +19,12 @@ import { useSelector, useDispatch } from "react-redux";
 import { loadUser } from "../../Auth/AuthSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import EditProfileModal from "./Modals/EditProfileModal";
-import postSlice, { loadPosts, loadUserPosts } from "../../Post/PostSlice";
+import postSlice, { loadUserPosts } from "../../Main/Post/PostSlice";
 import followSlice, { loadUserFollow } from "../../Follow/FollowSlice";
 import axios from "axios";
 import FollowingsModal from "./Modals/FollowingsModal";
 import FollowersModal from "./Modals/FollowersModal";
+import chatSlice from "../Chat/ChatSlice";
 
 function ProfileScreen(props) {
   const dispatch = useDispatch();
@@ -36,6 +37,7 @@ function ProfileScreen(props) {
   const setLoading = () => {
     dispatch(postSlice.actions.setPostsLoading());
     dispatch(followSlice.actions.setFollowLoading());
+    dispatch(chatSlice.actions.setDefault());
   };
 
   useEffect(() => {
@@ -54,7 +56,11 @@ function ProfileScreen(props) {
   const [showFollowersModal, setShowFollowersModal] = useState(false);
 
   if (postsData.postsLoading || follow.followLoading) {
-    return null;
+    return (
+      <View>
+        <Text>Loading o Profile Screen</Text>
+      </View>
+    );
   }
 
   const onLogout = async () => {
@@ -78,6 +84,11 @@ function ProfileScreen(props) {
         );
       }
     } catch (error) {}
+  };
+
+  const onMessage = async () => {
+    const members = [currentUser._id, props.route.params.user._id];
+    console.log(members);
   };
 
   return (
@@ -291,29 +302,12 @@ function ProfileScreen(props) {
                   width: 160,
                 }}
                 titleStyle={{ color: "#000000", fontSize: 15 }}
+                onPress={onMessage}
               />
             </View>
           )}
         </View>
         <View>
-          {/* <View style={styles.containerGallery}>
-            <FlatList
-              numColumns={3}
-              scrollEnabled={true}
-              horizontal={false}
-              data={postsData.posts}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={styles.containerImage}
-                  key={item._id}
-                  onPress={() => console.log(item._id)}
-                >
-                  <Image style={styles.image} source={{ uri: item.picture }} />
-                </TouchableOpacity>
-              )}
-            />
-            
-          </View> */}
           <View
             style={{ marginTop: 20, flexDirection: "row", flexWrap: "wrap" }}
           >
@@ -326,9 +320,10 @@ function ProfileScreen(props) {
                       margin: 2,
                     }}
                     key={item._id}
-                    onPress={() =>
-                      props.navigation.navigate("Post", { post: item })
-                    }
+                    onPress={() => {
+                      dispatch(postSlice.actions.setPost({ post: item }));
+                      props.navigation.navigate("Post");
+                    }}
                   >
                     <Image
                       style={styles.image}

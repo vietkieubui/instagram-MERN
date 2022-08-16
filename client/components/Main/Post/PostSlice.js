@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { LOCAL_STORAGE_TOKEN_NAME, apiUrl } from "../../assets/constants";
+import { LOCAL_STORAGE_TOKEN_NAME, apiUrl } from "../../../assets/constants";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import setAuthToken from "../../utils/setAuthToken";
+import setAuthToken from "../../../utils/setAuthToken";
 
 const initialState = {
   post: null,
@@ -11,6 +11,17 @@ const initialState = {
   followingPosts: [],
   postsLoading: true,
 };
+
+export const loadPost = createAsyncThunk("post/loadPost", async (postId) => {
+  try {
+    const dataLoadPost = await axios.get(`${apiUrl}/posts/post/${postId}`);
+    if (dataLoadPost.data.success) {
+      return { post: dataLoadPost.data.post };
+    }
+  } catch (error) {
+    console.log(error);
+  }
+});
 
 export const loadPosts = createAsyncThunk("post/loadPosts", async () => {
   let user = null;
@@ -78,14 +89,6 @@ export const loadFollowingPosts = createAsyncThunk(
   }
 );
 
-const getPosts = async (userId) => {
-  const dataPosts = await axios.get(`${apiUrl}/posts/${userId}`);
-  if (dataPosts.data.success) {
-    return dataPosts.data.posts;
-  }
-  return null;
-};
-
 const postSlice = createSlice({
   name: "post",
   initialState,
@@ -93,8 +96,21 @@ const postSlice = createSlice({
     setPostsLoading: (state, action) => {
       state.postsLoading = true;
     },
+    setPost: (state, action) => {
+      state.post = action.payload.post;
+    },
+    setDefault: (state, action) => {
+      state.post = null;
+      state.posts = [];
+      state.userPosts = [];
+      state.followingPosts = [];
+      state.postsLoading = true;
+    },
   },
   extraReducers: (builder) => {
+    builder.addCase(loadPost.fulfilled, (state, action) => {
+      state.post = action.payload.post;
+    });
     builder.addCase(loadPosts.fulfilled, (state, action) => {
       state.post = action.payload.post;
       state.posts = action.payload.posts;

@@ -40,6 +40,11 @@ const authSlice = createSlice({
     setCurrentUser: (state, action) => {
       state.user = action.payload;
     },
+    setDefault: (state, action) => {
+      state.isAuthenticated = false;
+      state.user = null;
+      state.authLoading = true;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(loadUser.fulfilled, (state, action) => {

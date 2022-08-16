@@ -7,39 +7,40 @@ import { useSelector, useDispatch } from "react-redux";
 import authSlice, { loadUser } from "../../../Auth/AuthSlice";
 import { apiUrl } from "../../../../assets/constants";
 import axios from "axios";
+import { loadComments } from "./commentSlice";
 
-export default function EditProfileModal({
+export default function EditCommentModal({
   showEditModal,
   setShowEditModal,
-  navigation,
+  comment,
+  postId,
 }) {
-  const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
-  const [updatedUser, setUpdatedUser] = useState(user);
+  const [updatedComment, setUpdatedComment] = useState(comment);
   useEffect(() => {
-    setUpdatedUser(user);
+    setUpdatedComment(comment);
   }, []);
-  const { name, bio } = updatedUser;
+  const { content, _id } = updatedComment;
 
   const onClose = () => {
     setShowEditModal(false);
   };
   const onUpdate = async () => {
     try {
-      const response = await axios.put(`${apiUrl}/user/edit`, { name, bio });
+      const response = await axios.put(
+        `${apiUrl}/posts/comment/update/${_id}`,
+        { content }
+      );
       if (response.data.success) {
-        dispatch(authSlice.actions.setCurrentUser(response.data.user));
-
+        dispatch(loadComments(postId));
         Alert.alert("Success!", response.data.message, [
           {
             text: "OK",
             onPress: () => {
               setShowEditModal(false);
-              navigation.navigate("Profile", { user: response.data.user });
             },
           },
         ]);
-        // setShowEditModal(false);
         return response.data;
       }
     } catch (error) {
@@ -55,26 +56,16 @@ export default function EditProfileModal({
     <View style={{ flex: 1 }}>
       <Modal isVisible={showEditModal} onBackdropPress={onClose}>
         <View style={{ backgroundColor: "white" }}>
-          <Text style={{ ...FONTS.h1, alignSelf: "center" }}>Edit Profile</Text>
+          <Text style={{ ...FONTS.h1, alignSelf: "center" }}>Edit Comment</Text>
           <View style={{ marginLeft: 20 }}>
             <Text style={{ ...FONTS.h3, padding: 10, paddingBottom: 0 }}>
-              Name
+              Content
             </Text>
             <Input
-              placeholder="Name"
-              value={name}
+              placeholder="Content"
+              value={content}
               onChangeText={(text) =>
-                setUpdatedUser({ ...updatedUser, name: text })
-              }
-            />
-            <Text style={{ ...FONTS.h3, padding: 10, paddingBottom: 0 }}>
-              Bio
-            </Text>
-            <Input
-              placeholder="Bio"
-              value={bio}
-              onChangeText={(text) =>
-                setUpdatedUser({ ...updatedUser, bio: text })
+                setUpdatedComment({ ...updatedComment, content: text })
               }
             />
           </View>
