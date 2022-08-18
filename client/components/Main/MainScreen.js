@@ -5,11 +5,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import { loadUser } from "../Auth/AuthSlice";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
+
 //Screen
 import ProfileScreen from "./Profile/ProfileScreen";
 import FeedScreen from "./Feed/FeedScreen";
 import SearchScreen from "./Search/SearchScreen";
 import { loadFollowingPosts } from "../Main/Post/PostSlice";
+import { socket } from "../../assets/constants";
 
 const Tab = createMaterialBottomTabNavigator();
 const EpmtyScreen = () => {
@@ -21,7 +23,9 @@ export default function MainScreen({ navigation }) {
   const auth = useSelector((state) => state.auth);
   const follow = useSelector((state) => state.follow);
   const post = useSelector((state) => state.post);
+
   useEffect(() => {
+    socket.emit("connection");
     dispatch(loadUser());
   }, []);
 

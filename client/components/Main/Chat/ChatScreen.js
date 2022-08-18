@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
@@ -10,13 +10,14 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import { Icon, Image } from "react-native-elements";
-import { apiUrl, SIZES } from "../../../assets/constants";
+import { apiUrl, FONTS, SIZES, socket } from "../../../assets/constants";
 import { formatDate } from "../../../utils/actions";
 import chatSlice, { loadConversations, loadMessages } from "./ChatSlice";
 import axios from "axios";
 
-export default function ChatScreen() {
+export default function ChatScreen(props) {
   const dispatch = useDispatch();
+  const scrollViewRef = useRef();
 
   const chat = useSelector((state) => state.chat);
   const conversation = useSelector((state) => state.chat.conversation);
@@ -28,6 +29,16 @@ export default function ChatScreen() {
     dispatch(chatSlice.actions.setMessagesLoading());
     dispatch(loadMessages(conversation._id));
   }, []);
+
+  useEffect(() => {
+    socket.on("receive-message", ({ conversationId }) => {
+      if (conversationId === conversation._id) {
+        dispatch(loadMessages(conversation._id));
+        dispatch(loadConversations());
+      }
+    });
+  }, [messages]);
+
   if (chat.messagesLoading) {
     return (
       <SafeAreaView>
@@ -59,6 +70,7 @@ export default function ChatScreen() {
         { content: messageText }
       );
       if (dataSendMessage.data.success) {
+        socket.emit("send-message", { conversationId: conversation._id });
         setMessageText("");
         dispatch(loadMessages(conversation._id));
         dispatch(loadConversations());
@@ -78,43 +90,55 @@ export default function ChatScreen() {
           flexDirection: "column",
         }}
       >
-        <Text>CHat screen</Text>
+        <View style={{ flexDirection: "row", marginLeft: 20 }}>
+          <Icon
+            type="antdesign"
+            name="arrowleft"
+            onPress={() => props.navigation.goBack()}
+          />
+          <Text style={{ ...FONTS.h4, marginLeft: 20 }}>
+            {props.route.params.receiver.username}
+          </Text>
+        </View>
+
         <View>
-          <ScrollView>{body}</ScrollView>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginBottom: 20,
-            }}
-          >
-            <TextInput
-              placeholder="Aa"
-              multiline
-              value={messageText}
-              onChangeText={(text) => setMessageText(text)}
+          <ScrollView ref={scrollViewRef} style={{ marginBottom: 20 }}>
+            <View>{body}</View>
+            <View
               style={{
-                height: 30,
-                marginLeft: 10,
-                borderColor: "#a1a5ad",
-                borderWidth: 1,
-                flex: 49 / 50,
+                flexDirection: "row",
+                justifyContent: "space-between",
+                marginBottom: 20,
               }}
-            />
-            <TouchableOpacity disabled={!messageText} onPress={onSendMessage}>
-              <Icon
-                type="antdesign"
-                name="rightcircle"
-                color={messageText ? "#0000ff" : "gray"}
+            >
+              <TextInput
+                placeholder="Aa"
+                multiline
+                value={messageText}
+                onChangeText={(text) => setMessageText(text)}
                 style={{
-                  width: 30,
                   height: 30,
-                  justifyContent: "center",
-                  alignItems: "center",
+                  marginLeft: 10,
+                  borderColor: "#a1a5ad",
+                  borderWidth: 1,
+                  flex: 49 / 50,
                 }}
               />
-            </TouchableOpacity>
-          </View>
+              <TouchableOpacity disabled={!messageText} onPress={onSendMessage}>
+                <Icon
+                  type="antdesign"
+                  name="rightcircle"
+                  color={messageText ? "#0000ff" : "gray"}
+                  style={{
+                    width: 30,
+                    height: 30,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                />
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>

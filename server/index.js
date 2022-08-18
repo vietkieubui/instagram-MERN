@@ -43,10 +43,13 @@ app.use("/api/chat", chatRouter);
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
-// server.listen(3000, () => {
-//   console.log("SERSER RUNNING ON PORT: ", 3000);
-// });
-
-// io.on("connection", (socket) => {
-//   console.log("A USER CONNECTED");
-// });
+server.listen(3000, () => {
+  console.log("listening on *:3000");
+});
+io.on("connection", (socket) => {
+  console.log("a user connected");
+  socket.on("send-message", ({ conversationId }) => {
+    console.log(conversationId);
+    io.emit("receive-message", { conversationId });
+  });
+});

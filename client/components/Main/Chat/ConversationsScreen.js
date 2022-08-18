@@ -21,7 +21,7 @@ const SingleConversation = ({ navigation, conversation }) => {
         style={{ flexDirection: "row", margin: 10 }}
         onPress={() => {
           dispatch(chatSlice.actions.setConversation(conversation));
-          navigation.navigate("Chat");
+          navigation.navigate("Chat", { receiver: receiver[0] });
         }}
       >
         <View>

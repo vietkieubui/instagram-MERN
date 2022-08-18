@@ -88,7 +88,24 @@ function ProfileScreen(props) {
 
   const onMessage = async () => {
     const members = [currentUser._id, props.route.params.user._id];
-    console.log(members);
+    try {
+      const dataCreateConversation = await axios.post(
+        `${apiUrl}/chat/conversation`,
+        { members }
+      );
+      if (dataCreateConversation.data.success) {
+        dispatch(
+          chatSlice.actions.setConversation(
+            dataCreateConversation.data.conversation
+          )
+        );
+        props.navigation.navigate("Chat", {
+          receiver: props.route.params.user,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
