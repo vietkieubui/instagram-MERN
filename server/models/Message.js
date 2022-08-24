@@ -10,7 +10,7 @@ const MessageSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "users",
   },
-  content: {
+  text: {
     type: String,
     required: true,
   },

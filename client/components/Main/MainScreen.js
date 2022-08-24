@@ -25,7 +25,6 @@ export default function MainScreen({ navigation }) {
   const post = useSelector((state) => state.post);
 
   useEffect(() => {
-    socket.emit("connection");
     dispatch(loadUser());
   }, []);
 

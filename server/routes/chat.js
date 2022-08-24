@@ -114,9 +114,9 @@ router.get("/conversation", verifyToken, async (req, res) => {
  */
 
 router.post("/message/:id", verifyToken, async (req, res) => {
-  const { content } = req.body;
-  if (!content) {
-    return res.json({ success: false, message: "Content required!" });
+  const { text } = req.body;
+  if (!text) {
+    return res.json({ success: false, message: "Text required!" });
   }
   const conversation = await Conversation.findById(req.params.id);
   if (!conversation) {
@@ -133,7 +133,7 @@ router.post("/message/:id", verifyToken, async (req, res) => {
   }
   try {
     const newMessage = new Message({
-      content,
+      text,
       conversation: req.params.id,
       user: req.userId,
     });
@@ -178,7 +178,9 @@ router.get("/conversation/:id", verifyToken, async (req, res) => {
     const conversationMessagesCondition = { conversation: conversation._id };
     const conversationMessages = await Message.find(
       conversationMessagesCondition
-    ).populate("user", ["username", "avatar", "name", "bio"]);
+    )
+      .populate("user", ["username", "avatar", "name", "bio"])
+      .sort({ createdAt: -1 });
     if (!conversationMessages) {
       return res.status(401).json({
         success: false,

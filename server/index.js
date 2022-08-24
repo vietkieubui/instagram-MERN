@@ -47,9 +47,12 @@ server.listen(3000, () => {
   console.log("listening on *:3000");
 });
 io.on("connection", (socket) => {
-  console.log("a user connected");
-  socket.on("send-message", ({ conversationId }) => {
+  console.log("a user connected ____ ", socket.id);
+  socket.on("message", ({ conversationId }) => {
     console.log(conversationId);
-    io.emit("receive-message", { conversationId });
+    io.emit("message", { conversationId });
   });
+});
+io.on("disconnected", (socket) => {
+  console.log("a user disconnected");
 });

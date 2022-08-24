@@ -14,6 +14,7 @@ import {
   COLORS,
   LOCAL_STORAGE_TOKEN_NAME,
   apiUrl,
+  socket,
 } from "./../../../assets/constants";
 import { useSelector, useDispatch } from "react-redux";
 import { loadUser } from "../../Auth/AuthSlice";
@@ -67,6 +68,7 @@ function ProfileScreen(props) {
     await AsyncStorage.removeItem(LOCAL_STORAGE_TOKEN_NAME);
     dispatch(loadUser());
     setLoading();
+    socket.disconnect();
     props.navigation.navigate("Landing");
   };
 

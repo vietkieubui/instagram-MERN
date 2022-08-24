@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity } from "react-native";
 import { Image } from "react-native-elements";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
-import { FONTS } from "../../../assets/constants";
+import { FONTS, SIZES } from "../../../assets/constants";
 import chatSlice, { loadConversations } from "./ChatSlice";
 import { formatRelative } from "date-fns";
 import { formatDate } from "../../../utils/actions";
@@ -73,7 +73,13 @@ export default function ConversationsScreen(props) {
     );
   }
   return (
-    <SafeAreaView>
+    <SafeAreaView
+      style={{
+        backgroundColor: "white",
+        width: SIZES.width,
+        height: SIZES.height,
+      }}
+    >
       <Text>ConversationsScreen</Text>
       {body}
     </SafeAreaView>

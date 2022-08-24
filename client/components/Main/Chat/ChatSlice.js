@@ -69,6 +69,9 @@ const chatSlice = createSlice({
       state.conversationsLoading = true;
       state.messagesLoading = true;
     },
+    addMessage: (state, action) => {
+      state.messages.push(action.payload);
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(loadConversations.fulfilled, (state, action) => {
