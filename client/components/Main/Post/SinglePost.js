@@ -75,6 +75,7 @@ export default function SinglePost({ post, navigation }) {
         likes={likesList}
         showLikesModal={showLikesModal}
         setShowLikesModal={setShowLikesModal}
+        navigation={navigation}
       />
       <TouchableOpacity
         style={styles.userPostHeader}
@@ -103,24 +104,27 @@ export default function SinglePost({ post, navigation }) {
       />
       <View style={styles.postInfo}>
         <View style={styles.communicateIcon}>
-          {liked ? (
-            <Icon
-              type="antdesign"
-              name="heart"
-              color="#ff0000"
-              size={24}
-              onPress={onLike}
-            />
-          ) : (
-            <Icon type="antdesign" name="hearto" size={24} onPress={onLike} />
-          )}
+          <TouchableOpacity onPress={onLike}>
+            {liked ? (
+              <Icon type="antdesign" name="heart" color="#ff0000" size={24} />
+            ) : (
+              <Icon type="antdesign" name="hearto" size={24} />
+            )}
+          </TouchableOpacity>
 
-          <Icon
-            type="ionicon"
-            name="chatbubble-outline"
-            size={24}
-            style={{ marginLeft: 10 }}
-          />
+          <TouchableOpacity
+            onPress={() => {
+              dispatch(postSlice.actions.setPost({ post }));
+              navigation.navigate("Post");
+            }}
+          >
+            <Icon
+              type="ionicon"
+              name="chatbubble-outline"
+              size={24}
+              style={{ marginLeft: 10 }}
+            />
+          </TouchableOpacity>
         </View>
         <TouchableOpacity onPress={setShowLikesModal.bind(this, true)}>
           <Text style={styles.likeCount}>{likes.length} likes</Text>

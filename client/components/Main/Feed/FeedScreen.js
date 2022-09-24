@@ -90,7 +90,6 @@ const styles = StyleSheet.create({
   },
   feedContainer: {
     flexDirection: "column",
-    // justifyContent: "flex-start",
   },
   postContainer: {},
   userPostHeader: {},

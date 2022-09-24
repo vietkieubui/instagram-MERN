@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Text } from "react-native";
+import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -11,7 +11,11 @@ import {
 } from "../../../assets/constants";
 import chatSlice, { loadConversations, loadMessages } from "./ChatSlice";
 import axios from "axios";
-import { GiftedChat } from "react-native-gifted-chat";
+import {
+  GiftedChat,
+  InputToolbar,
+  MessageContainer,
+} from "react-native-gifted-chat";
 import io from "socket.io-client";
 
 export default function GiftedChatScreen(props) {
@@ -64,14 +68,36 @@ export default function GiftedChatScreen(props) {
       </SafeAreaView>
     );
   }
+  const customtInputToolbar = (props) => {
+    return (
+      <InputToolbar
+        {...props}
+        containerStyle={{
+          backgroundColor: "white",
+          borderTopColor: "#E8E8E8",
+          borderTopWidth: 1,
+          padding: 8,
+        }}
+      />
+    );
+  };
+  const customMessageContainer = (props) => {
+    return <MessageContainer {...props} />;
+  };
   return (
-    <GiftedChat
-      messagesContainerStyle={{ backgroundColor: "#ffffff" }}
-      messages={messages}
-      user={currentUser}
-      text={messageText}
-      onInputTextChanged={(text) => setMessageText(text)}
-      onSend={onSendMessage}
-    />
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={{ backgroundColor: "#fff" }}>
+        <Text>123</Text>
+      </View>
+      <GiftedChat
+        // renderInputToolbar={(props) => customtInputToolbar(props)}
+        messagesContainerStyle={{ backgroundColor: "#ffffff" }}
+        messages={messages}
+        user={currentUser}
+        text={messageText}
+        onInputTextChanged={(text) => setMessageText(text)}
+        onSend={onSendMessage}
+      />
+    </SafeAreaView>
   );
 }
