@@ -31,7 +31,9 @@ connectDB();
 app.use(express.json());
 app.use(cors());
 
-app.get("/", (req, res) => res.send("INSTAGRAM MERN API"));
+app.get("/", (req, res) => {
+  console.log("INSTAGRAM MERN API Welcome");
+  res.send("INSTAGRAM MERN API");});
 
 app.use("/api/auth", authRouter);
 app.use("/api/posts", postRouter);
